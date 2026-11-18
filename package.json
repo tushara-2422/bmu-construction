@@ -1,0 +1,14 @@
+{
+  "name": "ironcrest-construction",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ironcrest construction landing page",
+  "type": "module",
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "start": "node dev-server.mjs --no-reload"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ironcrest — Construction, built without chaos</title>
+  <meta name="description" content="Ironcrest is a design-build general contractor delivering commercial, residential and industrial projects on time, on budget and fully accountable." />
+  <meta name="theme-color" content="#f6f4ef" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230f0f0f'/%3E%3Cpath d='M9 23V13.5L16 9l7 4.5V23h-4.5v-5.5h-5V23z' fill='%23ff5a1f'/%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300..700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+
+  <!-- ================= PRELOADER ================= -->
+  <div class="preloader" aria-hidden="true">
+    <div class="preloader__mark">
+      <svg viewBox="0 0 32 32" width="34" height="34"><path d="M6 26V12l10-6 10 6v14h-6v-8h-8v8z" fill="currentColor"/></svg>
+    </div>
+    <div class="preloader__foot">
+      <span>Ironcrest — building since 1998</span>
+      <span class="preloader__count"><b id="loaderCount">0</b>%</span>
+    </div>
+    <div class="preloader__bar"><span></span></div>
+  </div>
+
+  <div class="view-bubble" aria-hidden="true">View</div>
+
+  <!-- ================= NAV ================= -->
+  <header class="nav" id="nav">
+    <a class="logo" href="#top" aria-label="Ironcrest home">
+      <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path d="M6 26V12l10-6 10 6v14h-6v-8h-8v8z" fill="currentColor"/></svg>
+      <span>Ironcrest</span>
+    </a>
+
+    <div class="nav__pill">
+      <button class="nav__menu" aria-expanded="false" aria-controls="menu">
+        <span class="nav__burger"><i></i><i></i></span>
+        <span class="nav__menu-label">Menu</span>
+      </button>
+      <span class="nav__sep"></span>
+      <span class="nav__status"><i></i>Booking Q1 2027</span>
+    </div>
+
+    <a class="nav__cta" href="#contact">Get a quote</a>
+  </header>
+
+  <div class="menu" id="menu" aria-hidden="true">
+    <div class="menu__inner">
+      <nav class="menu__links" aria-label="Main">
+        <a href="#services"><small>01</small>Services</a>
+        <a href="#work"><small>02</small>Projects</a>
+        <a href="#process"><small>03</small>Process</a>
+        <a href="#faq"><small>04</small>FAQ</a>
+        <a href="#contact"><small>05</small>Contact</a>
+      </nav>
+      <div class="menu__side">
+        <div>
+          <p class="menu__label">Head office</p>
+          <p>1200 W Fulton Market, Suite 400<br />Chicago, IL 60607</p>
+        </div>
+        <div>
+          <p class="menu__label">Talk to us</p>
+          <a href="tel:+15550142290">+1 (555) 014-2290</a><br />
+          <a href="mailto:hello@ironcrest.example">hello@ironcrest.example</a>
+        </div>
+        <img src="https://images.unsplash.com/photo-1485083269755-a7b559a4fe5e?auto=format&fit=crop&w=900&q=80" alt="Tower cranes silhouetted at dusk" loading="lazy" />
+      </div>
+    </div>
+  </div>
+
+  <a class="talk" href="tel:+15550142290"><span>Talk to us</span><i><svg viewBox="0 0 24 24" width="13" height="13"><path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.25 11.4 11.4 0 003.6.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1z" fill="currentColor"/></svg></i></a>
+
+  <main>
+
+    <!-- ================= HERO ================= -->
+    <section class="hero" id="top" data-nav="light">
+      <div class="orbit" aria-hidden="true">
+        <div class="orbit__ring">
+          <div class="tile"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=420&q=70" alt="" /><span>Logistics</span></div>
+          <div class="tile"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=420&q=70" alt="" /><span>Residential</span></div>
+          <div class="tile"><img src="https://images.unsplash.com/photo-1535732759880-bbd5c7265e3f?auto=format&fit=crop&w=420&q=70" alt="" /><span>High-rise</span></div>
+          <div class="tile"><img src="https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=420&q=70" alt="" /><span>Industrial</span></div>
+          <div class="tile"><img src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=420&q=70" alt="" /><span>Cultural</span></div>
+          <div class="tile"><img src="https://images.unsplash.com/photo-1503708928676-1cb796a0891e?auto=format&fit=crop&w=420&q=70" alt="" /><span>Civil works</span></div>
+          <div class="tile"><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=420&q=70" alt="" /><span>Interiors</span></div>
+          <div class="tile"><img src="https://images.unsplash.com/photo-1572883454114-1cf0031ede2a?auto=format&fit=crop&w=420&q=70" alt="" /><span>Commercial</span></div>
+        </div>
+        <p class="orbit__center">Design-build contractor delivering<br />commercial, residential &amp; industrial<br />projects across North America</p>
+      </div>
+
+      <ul class="hero__chips" aria-label="Capabilities">
+        <li>Pre-construction</li>
+        <li>Design–Build</li>
+        <li>General Contracting</li>
+        <li>Industrial &amp; Logistics</li>
+        <li>Renovation</li>
+        <li>Project Management</li>
+        <li>Steel Fabrication</li>
+      </ul>
+
+      <div class="hero__bottom">
+        <h1 class="hero__title">
+          <span class="line"><span>Built without chaos.</span></span>
+          <span class="line line--muted"><span>Delivered with certainty.</span></span>
+        </h1>
+        <a class="hero__scroll" href="#intro">Scroll down</a>
+      </div>
+    </section>
+
+    <!-- ================= INTRO ================= -->
+    <section class="intro" id="intro" data-nav="light">
+      <div class="intro__side">
+        <p>Design, engineering, construction and aftercare. One contract, one team, one number to call.</p>
+      </div>
+      <div class="intro__main">
+        <h2 class="display" data-split>Every trade. <span class="muted">One accountable team.</span></h2>
+      </div>
+    </section>
+
+    <!-- ================= SERVICE PANELS ================= -->
+    <section class="panels" id="services">
+      <article class="panel panel--orange" data-nav="color">
+        <header class="panel__head">
+          <h3>Commercial<br />Construction</h3>
+          <span class="panel__num">01</span>
+        </header>
+        <div class="panel__cols">
+          <div><small>■ Offices, retail &amp; mixed-use</small><p>We build workplaces that <span>don't just look good on opening day. They perform for decades.</span></p></div>
+          <div><small>■ Ground-up &amp; core-and-shell</small><p>Fixed programmes, open-book costs and <span>weekly owner reports with live photo logs.</span></p></div>
+        </div>
+        <a class="panel__btn" href="#contact">Explore in detail</a>
+        <div class="panel__media">
+          <img src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=900&q=75" alt="Glass towers rising with cranes" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=900&q=75" alt="Finished office interior" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1572883454114-1cf0031ede2a?auto=format&fit=crop&w=900&q=75" alt="Glass facade with orange reflections" loading="lazy" />
+        </div>
+      </article>
+
+      <article class="panel panel--teal" data-nav="color">
+        <header class="panel__head">
+          <h3>Custom<br />Residential</h3>
+          <span class="panel__num">02</span>
+        </header>
+        <div class="panel__cols">
+          <div><small>■ Architect-led private homes</small><p>Every joint and junction is executed <span>to the standard the drawings promised.</span></p></div>
+          <div><small>■ Multi-family &amp; townhomes</small><p>Phased delivery that <span>keeps sales, lenders and residents on schedule.</span></p></div>
+        </div>
+        <a class="panel__btn" href="#contact">Explore in detail</a>
+        <div class="panel__media">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=75" alt="Modern timber and glass home at dusk" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1590725140246-20acdee442be?auto=format&fit=crop&w=900&q=75" alt="A-frame cabin interior" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=900&q=75" alt="Apartment building with balconies" loading="lazy" />
+        </div>
+      </article>
+
+      <article class="panel panel--steel" data-nav="color">
+        <header class="panel__head">
+          <h3>Industrial<br />&amp; Logistics</h3>
+          <span class="panel__num">03</span>
+        </header>
+        <div class="panel__cols">
+          <div><small>■ Warehouses &amp; distribution</small><p>Clear-span structures engineered <span>for heavy loads and 24/7 operation.</span></p></div>
+          <div><small>■ Manufacturing &amp; process</small><p>Food-grade, cleanroom and cold-chain facilities <span>commissioned right first time.</span></p></div>
+        </div>
+        <a class="panel__btn" href="#contact">Explore in detail</a>
+        <div class="panel__media">
+          <img src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=900&q=75" alt="High-bay warehouse racking" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=900&q=75" alt="Steel fabrication sparks" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=900&q=75" alt="Process plant pipework" loading="lazy" />
+        </div>
+      </article>
+
+      <article class="panel panel--rust" data-nav="color">
+        <header class="panel__head">
+          <h3>Renovation<br />&amp; Retrofit</h3>
+          <span class="panel__num">04</span>
+        </header>
+        <div class="panel__cols">
+          <div><small>■ Live-environment works</small><p>Hospitals, schools and offices upgraded <span>without shutting the doors.</span></p></div>
+          <div><small>■ Seismic &amp; energy upgrades</small><p>Structural and envelope retrofits that <span>add decades of life and cut running costs.</span></p></div>
+        </div>
+        <a class="panel__btn" href="#contact">Explore in detail</a>
+        <div class="panel__media">
+          <img src="https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=900&q=75" alt="Interior renovation in progress" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1541976590-713941681591?auto=format&fit=crop&w=900&q=75" alt="Refurbished residential facade" loading="lazy" />
+          <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=75" alt="Finished open-plan living space" loading="lazy" />
+        </div>
+      </article>
+    </section>
+
+    <!-- ================= METRICS ================= -->
+    <section class="metrics" data-nav="dark">
+      <div class="container">
+        <div class="metrics__head">
+          <div>
+            <p class="tag tag--dark" data-reveal>Metrics</p>
+            <h2 class="h2" data-split>Building the future, <span class="muted">intentionally crafted.</span></h2>
+          </div>
+          <a class="pill pill--light" href="#contact" data-reveal>Work with us</a>
+        </div>
+        <div class="metrics__grid">
+          <div class="metric metric--cream" data-reveal>
+            <span class="metric__value">$<b data-count="2">0</b>M — $<b data-count="250">0</b>M</span>
+            <span class="metric__label">Project range</span>
+            <p>From focused fit-outs to campus-scale industrial developments.</p>
+          </div>
+          <div class="metric" data-reveal style="--d:.08s">
+            <span class="metric__value"><b data-count="640">0</b>+</span>
+            <span class="metric__label">Projects delivered</span>
+            <p>Across commercial, residential, industrial and civic sectors.</p>
+          </div>
+          <div class="metric metric--cream" data-reveal style="--d:.16s">
+            <span class="metric__value"><b data-count="94">0</b>%</span>
+            <span class="metric__label">On or ahead of schedule</span>
+            <p>Measured at substantial completion over the last ten years.</p>
+          </div>
+          <div class="metric" data-reveal style="--d:.24s">
+            <span class="metric__value"><b data-count="27">0</b> yrs</span>
+            <span class="metric__label">Active field experience</span>
+            <p>Three generations of builders, one uncompromising standard.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= WORK ================= -->
+    <section class="work" id="work" data-nav="light">
+      <div class="container work__head">
+        <h2 class="display" data-split>Work we are <span class="muted">proud of.</span></h2>
+        <p data-reveal>Real projects, real results.<br />Built for owners who mean business.</p>
+      </div>
+
+      <div class="marquee" aria-label="Project gallery">
+        <div class="marquee__row">
+          <div class="marquee__track">
+            <figure class="mtile" data-cursor="view"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=700&q=70" alt="Northline logistics hub interior" loading="lazy" /><figcaption>Northline Logistics Hub</figcaption></figure>
+            <figure class="mtile" data-cursor="view"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=700&q=70" alt="Ridge residence at dusk" loading="lazy" /><figcaption>The Ridge Residence</figcaption></figure>
+            <figure class="mtile" data-cursor="view"><img src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=700&q=70" alt="Halcyon arts pavilion" loading="lazy" /><figcaption>Halcyon Arts Pavilion</figcaption></figure>
+            <figure class="mtile" data-cursor="view"><img src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=700&q=70" alt="Harbor Point towers under construction" loading="lazy" /><figcaption>Harbor Point Towers</figcaption></figure>
+            <figure class="mtile" data-cursor="view"><img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=700&q=70" alt="Alder Court apartments" loading="lazy" /><figcaption>Alder Court Apartments</figcaption></figure>
+          </div>
+        </div>
+        <div class="marquee__row marquee__row--rev">
+          <div class="marquee__track">
+            <figure class="mtile" data-cursor="view"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=700&q=70" alt="Basalt Capital office fit-out" loading="lazy" /><figcaption>Basalt Capital HQ</figcaption></figure>
+            <figure class="mtile" data-cursor="view"><img src="https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=700&q=70" alt="Vantage process plant" loading="lazy" /><figcaption>Vantage Process Plant</figcaption></figure>
+            <figure class="mtile" data-cursor="view"><img src="https://images.unsplash.com/photo-1590725140246-20acdee442be?auto=format&fit=crop&w=700&q=70" alt="Pinecrest A-frame interior" loading="lazy" /><figcaption>Pinecrest A-Frame</figcaption></figure>
+            <figure class="mtile" data-cursor="view"><img src="https://images.unsplash.com/photo-1572883454114-1cf0031ede2a?auto=format&fit=crop&w=700&q=70" alt="Meridian Tower glass facade" loading="lazy" /><figcaption>Meridian Tower</figcaption></figure>
+            <figure class="mtile" data-cursor="view"><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=700&q=70" alt="Harbor Loft interior" loading="lazy" /><figcaption>Harbor Loft Interiors</figcaption></figure>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="plist__head">
+          <p class="tag" data-reveal>Selected projects</p>
+          <a class="pill" href="#contact" data-reveal>Start a project</a>
+        </div>
+        <ul class="plist">
+          <li class="prow is-open">
+            <button class="prow__head" aria-expanded="true"><span class="prow__idx">01</span><span class="prow__name">Northline Logistics Hub</span><span class="prow__type">Industrial</span><span class="prow__year">2026</span><i class="prow__icon"></i></button>
+            <div class="prow__body"><div class="prow__inner">
+              <img src="https://images.unsplash.com/photo-1517089596392-fb9a9033e05b?auto=format&fit=crop&w=900&q=75" alt="Aerial view of earthworks for the Northline hub" loading="lazy" />
+              <div><p>A 420,000 sq ft cross-dock distribution centre with 48 m clear spans, delivered in 11 months on a guaranteed maximum price.</p><div class="prow__tags"><span>Design–Build</span><span>Joliet, IL</span><span>420k sq ft</span></div></div>
+            </div></div>
+          </li>
+          <li class="prow">
+            <button class="prow__head" aria-expanded="false"><span class="prow__idx">02</span><span class="prow__name">Glassyard Offices</span><span class="prow__type">Commercial</span><span class="prow__year">2025</span><i class="prow__icon"></i></button>
+            <div class="prow__body"><div class="prow__inner">
+              <img src="https://images.unsplash.com/photo-1565008447742-97f6f38c985c?auto=format&fit=crop&w=900&q=75" alt="Glassyard office towers under construction" loading="lazy" />
+              <div><p>Twin 18-storey office towers with a shared podium, built on a live downtown site with zero lost-time incidents.</p><div class="prow__tags"><span>General Contracting</span><span>Chicago, IL</span><span>36 storeys</span></div></div>
+            </div></div>
+          </li>
+          <li class="prow">
+            <button class="prow__head" aria-expanded="false"><span class="prow__idx">03</span><span class="prow__name">The Ridge Residence</span><span class="prow__type">Residential</span><span class="prow__year">2024</span><i class="prow__icon"></i></button>
+            <div class="prow__body"><div class="prow__inner">
+              <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=75" alt="The Ridge Residence at dusk" loading="lazy" />
+              <div><p>An architect-led private home in timber, steel and glass — precision joinery throughout and a 10-year structural warranty.</p><div class="prow__tags"><span>Custom Residential</span><span>Aspen, CO</span><span>6,800 sq ft</span></div></div>
+            </div></div>
+          </li>
+          <li class="prow">
+            <button class="prow__head" aria-expanded="false"><span class="prow__idx">04</span><span class="prow__name">Weston Medical Wing</span><span class="prow__type">Renovation</span><span class="prow__year">2023</span><i class="prow__icon"></i></button>
+            <div class="prow__body"><div class="prow__inner">
+              <img src="https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=900&q=75" alt="Interior renovation of the Weston medical wing" loading="lazy" />
+              <div><p>A phased retrofit of an operating hospital wing, completed overnight and at weekends with no unplanned outages.</p><div class="prow__tags"><span>Live Retrofit</span><span>Denver, CO</span><span>4 phases</span></div></div>
+            </div></div>
+          </li>
+          <li class="prow">
+            <button class="prow__head" aria-expanded="false"><span class="prow__idx">05</span><span class="prow__name">Harbor Point Towers</span><span class="prow__type">Mixed-use</span><span class="prow__year">2023</span><i class="prow__icon"></i></button>
+            <div class="prow__body"><div class="prow__inner">
+              <img src="https://images.unsplash.com/photo-1535732759880-bbd5c7265e3f?auto=format&fit=crop&w=900&q=75" alt="Tower crane at Harbor Point" loading="lazy" />
+              <div><p>A waterfront mixed-use scheme of 312 homes over retail, topped out three weeks early despite a harsh winter.</p><div class="prow__tags"><span>Design–Build</span><span>Milwaukee, WI</span><span>312 homes</span></div></div>
+            </div></div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ================= PROCESS ================= -->
+    <section class="process" id="process" data-nav="light">
+      <div class="process__intro container">
+        <p class="tag" data-reveal>How it works</p>
+        <h2 class="display" data-split>From first call <span class="muted">to final handover.</span></h2>
+      </div>
+
+      <div class="process__pin">
+        <div class="process__sticky">
+          <ol class="process__nav" aria-hidden="true">
+            <li class="is-active"><i></i><span>Discovery</span></li>
+            <li><i></i><span>Pre-construction</span></li>
+            <li><i></i><span>Design</span></li>
+            <li><i></i><span>Build</span></li>
+            <li><i></i><span>Handover</span></li>
+          </ol>
+
+          <div class="process__num" aria-hidden="true"><div class="process__digits"><span>01</span><span>02</span><span>03</span><span>04</span><span>05</span></div></div>
+
+          <div class="process__copy">
+            <div class="pstep is-active"><h3>Discovery</h3><p>We walk the site with you, stress-test the brief and map risks, budget and timeline before anything is drawn.</p></div>
+            <div class="pstep"><h3>Pre-construction</h3><p>Estimators, engineers and trade partners price the job together, so the number you approve is the number you pay.</p></div>
+            <div class="pstep"><h3>Design</h3><p>One coordinated BIM model resolves structure, services and finishes on screen — not on site.</p></div>
+            <div class="pstep"><h3>Build</h3><p>Self-performed concrete and steel, a single site lead and weekly reports with live photo logs and cost tracking.</p></div>
+            <div class="pstep"><h3>Handover</h3><p>Commissioning, a zero-item punch list and a 10-year structural warranty backed by our aftercare team.</p></div>
+          </div>
+
+          <div class="process__media">
+            <div class="pmedia is-active"><img class="pm-a" src="https://images.unsplash.com/photo-1626885930974-4b69aa21bbf9?auto=format&fit=crop&w=900&q=75" alt="Site engineers in hard hats reviewing a site" loading="lazy" /><img class="pm-b" src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=700&q=75" alt="Team walking the site" loading="lazy" /></div>
+            <div class="pmedia"><img class="pm-a" src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=75" alt="Engineer marking up drawings" loading="lazy" /><img class="pm-b" src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=700&q=75" alt="Engineer reviewing data at a workstation" loading="lazy" /></div>
+            <div class="pmedia"><img class="pm-a" src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=900&q=75" alt="Architectural pavilion" loading="lazy" /><img class="pm-b" src="https://images.unsplash.com/photo-1541976590-713941681591?auto=format&fit=crop&w=700&q=75" alt="Facade detail" loading="lazy" /></div>
+            <div class="pmedia"><img class="pm-a" src="https://images.unsplash.com/photo-1517089596392-fb9a9033e05b?auto=format&fit=crop&w=900&q=75" alt="Excavators working on earthworks" loading="lazy" /><img class="pm-b" src="https://images.unsplash.com/photo-1489514354504-1653aa90e34e?auto=format&fit=crop&w=700&q=75" alt="Worker walking across rebar" loading="lazy" /></div>
+            <div class="pmedia"><img class="pm-a" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=75" alt="Finished home at dusk" loading="lazy" /><img class="pm-b" src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=700&q=75" alt="Finished interior" loading="lazy" /></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TESTIMONIALS ================= -->
+    <section class="reviews" data-nav="light">
+      <div class="container">
+        <div class="reviews__feature" data-reveal>
+          <img src="https://images.unsplash.com/photo-1626885930974-4b69aa21bbf9?auto=format&fit=crop&w=1800&q=75" alt="Ironcrest site leads on a project" loading="lazy" />
+          <blockquote>“Weekly updates kept everything clear before problems ever had time to grow.”<cite>Marcus Hale — Development Director, Northwind</cite></blockquote>
+        </div>
+        <div class="reviews__grid">
+          <figure class="review" data-reveal>
+            <div class="review__stars" aria-label="5 out of 5">★★★★★<b>5.0</b></div>
+            <blockquote>The distribution centre opened six weeks early. Their site discipline is the best we've seen in thirty years of development.</blockquote>
+            <figcaption><span class="avatar">DO</span><span><b>Daniel Okafor</b><small>Vertex Logistics Group</small></span></figcaption>
+          </figure>
+          <figure class="review" data-reveal style="--d:.08s">
+            <div class="review__stars" aria-label="5 out of 5">★★★★★<b>5.0</b></div>
+            <blockquote>Every apartment handed over on the date promised. Sales, lenders and buyers all stayed on side because nothing slipped.</blockquote>
+            <figcaption><span class="avatar">PH</span><span><b>Priya Hale</b><small>Alder &amp; Co. Real Estate</small></span></figcaption>
+          </figure>
+          <figure class="review" data-reveal style="--d:.16s">
+            <div class="review__stars" aria-label="4.9 out of 5">★★★★★<b>4.9</b></div>
+            <blockquote>They renovated a live hospital wing like a precision operation. Zero incidents, zero outages, and a team that genuinely cares.</blockquote>
+            <figcaption><span class="avatar">EV</span><span><b>Dr. Elena Varga</b><small>Meridian Health Partners</small></span></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FAQ ================= -->
+    <section class="faq" id="faq" data-nav="light">
+      <div class="container faq__grid">
+        <div>
+          <p class="tag" data-reveal>FAQs</p>
+          <h2 class="display" data-split>No fluff. <span class="muted">Just straight answers.</span></h2>
+        </div>
+        <ul class="faq__list">
+          <li class="qa"><button aria-expanded="false">How early should we involve a contractor?<i></i></button><div class="qa__body"><div><p>As early as possible. Bringing us in at concept stage lets us test buildability and cost before design is fixed — that's where most savings are found.</p></div></div></li>
+          <li class="qa"><button aria-expanded="false">Do you work on smaller projects or only large ones?<i></i></button><div class="qa__body"><div><p>Our projects range from around $2M fit-outs to $250M campuses. Smaller works are handled by a dedicated special-projects team with the same standards.</p></div></div></li>
+          <li class="qa"><button aria-expanded="false">How do you control cost and schedule?<i></i></button><div class="qa__body"><div><p>Open-book estimating, a guaranteed maximum price where it suits, and a live programme you can see at any time. Weekly reports show progress, cost and risk in one page.</p></div></div></li>
+          <li class="qa"><button aria-expanded="false">Can you handle design as well as construction?<i></i></button><div class="qa__body"><div><p>Yes. Our design–build model puts architects, engineers and builders under one contract, so there's one accountable team from sketch to keys.</p></div></div></li>
+          <li class="qa"><button aria-expanded="false">What happens after handover?<i></i></button><div class="qa__body"><div><p>Every project includes a 12-month defects period, a 10-year structural warranty and a named aftercare contact who knows your building.</p></div></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ================= CTA SPLIT ================= -->
+    <section class="split" id="contact" data-nav="light">
+      <a class="split__half" href="tel:+15550142290">
+        <small>Call us directly</small>
+        <span>Talk to an estimator<i>↗</i></span>
+      </a>
+      <button class="split__half split__half--white" type="button" data-open-form>
+        <small>or book a site visit</small>
+        <span>Book a site visit<i>↗</i></span>
+      </button>
+    </section>
+
+    <div class="formwrap" id="formwrap">
+      <form class="form container" novalidate>
+        <div class="form__intro">
+          <h3>Tell us about your project</h3>
+          <p>A senior estimator replies within one business day.</p>
+        </div>
+        <div class="form__fields">
+          <div class="field"><input id="f-name" name="name" type="text" placeholder=" " autocomplete="name" required /><label for="f-name">Full name</label></div>
+          <div class="field"><input id="f-email" name="email" type="email" placeholder=" " autocomplete="email" required /><label for="f-email">Email address</label></div>
+          <div class="field field--select">
+            <select id="f-type" name="type" required>
+              <option value="" selected disabled hidden></option>
+              <option>Commercial</option><option>Residential</option><option>Industrial &amp; logistics</option><option>Renovation &amp; retrofit</option><option>Other</option>
+            </select>
+            <label for="f-type">Project type</label>
+          </div>
+          <div class="field"><input id="f-date" name="date" type="text" placeholder=" " /><label for="f-date">Preferred visit date (optional)</label></div>
+          <div class="field field--wide"><textarea id="f-msg" name="message" rows="3" placeholder=" " required></textarea><label for="f-msg">Site address &amp; a few words about the project</label></div>
+          <button class="btn-dark" type="submit"><span class="form__btn-text">Send request</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <p class="form__status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer" data-nav="dark">
+    <div class="footer__glow" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="container footer__top">
+      <h2 class="footer__title">Let's<br />build<br /><span class="rotator"><span class="rotator__track"><span>landmarks</span><span>homes</span><span>warehouses</span><span>futures</span><span>landmarks</span></span></span><br />together</h2>
+
+      <div class="footer__offices">
+        <div><i class="pin"></i><b>Chicago</b><p>1200 W Fulton Market, Suite 400<br />Chicago, IL 60607</p><a href="tel:+15550142290">+1 (555) 014-2290</a></div>
+        <div><i class="pin"></i><b>Denver</b><p>1801 Wewatta St, Floor 9<br />Denver, CO 80202</p><a href="tel:+15550148810">+1 (555) 014-8810</a></div>
+      </div>
+
+      <nav class="footer__nav" aria-label="Footer">
+        <a href="#services">Services</a><a href="#work">Projects</a><a href="#process">Process</a><a href="#faq">FAQ</a><a href="#contact">Get in touch</a><a href="#top">Careers</a>
+      </nav>
+    </div>
+
+    <div class="container footer__mid">
+      <div><small>Contact us</small><a class="footer__mail" href="mailto:hello@ironcrest.example">hello@ironcrest.example</a></div>
+      <div class="footer__social">
+        <a href="#" aria-label="LinkedIn">in</a><a href="#" aria-label="Instagram">ig</a><a href="#" aria-label="YouTube">yt</a><a href="#" aria-label="X">x</a>
+      </div>
+      <div class="footer__legal"><a href="#">Privacy &amp; cookies</a><span>© <span id="year">2026</span> Ironcrest Construction Group</span></div>
+    </div>
+
+    <div class="footer__word" aria-hidden="true"><span data-fit>IRONCREST</span></div>
+  </footer>
+
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>
