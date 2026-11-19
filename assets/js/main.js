@@ -87,77 +87,63 @@
   }
 
   /* ---------------------------------------------------------
-     Hero slideshow
+     Hero: letters rise in, photos crossfade, and on desktop the
+     scroll position (--p) grows the photo window to full screen
+     behind the headline words.
      --------------------------------------------------------- */
   (() => {
     const root = $('.hero');
-    const slides = $$('.slide', root);
-    const INTERVAL = 1800; // ms each image stays on screen
-    const WIPE = 600;      // ms for the slide-in transition (matches CSS)
-    let index = 0;
-    let busy = false;
-    let timer = 0;
-    let paused = false;
+    if (!root) return;
 
-    function schedule() {
+    $$('[data-letters]', root).forEach((el) => {
+      const text = el.textContent;
+      el.textContent = '';
+      [...text].forEach((c, i) => {
+        if (c === ' ') { el.append(' '); return; }
+        const s = document.createElement('span');
+        s.className = 'ch';
+        s.textContent = c;
+        s.style.setProperty('--i', i);
+        el.append(s);
+      });
+    });
+
+    // slow crossfade between the photos
+    const imgs = $$('.hero__curtain img', root);
+    let index = 0, timer = 0, offscreen = false;
+    const schedule = () => {
       clearTimeout(timer);
-      if (reduceMotion || paused) return;
-      timer = setTimeout(() => go(index + 1, 1), INTERVAL);
-    }
-
-    function go(next, dir) {
-      next = (next + slides.length) % slides.length;
-      if (next === index || busy) return;
-      busy = true;
-      const from = slides[index];
-      const to = slides[next];
-      if (dir === undefined) dir = next > index ? 1 : -1;
-
-      from.classList.remove('is-active');
-      from.classList.add('is-leaving');
-      to.style.transition = 'none';
-      to.style.clipPath = dir > 0 ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)';
-      reflow(to);
-      to.style.transition = '';
-      to.style.clipPath = '';
-      to.classList.add('is-active');
-
-      index = next;
-      setTimeout(() => { from.classList.remove('is-leaving'); busy = false; }, reduceMotion ? 0 : WIPE);
-      schedule();
-    }
-
-    // pause only when the hero is off screen or the tab is hidden
-    let offscreen = false;
-    const sync = () => {
-      const was = paused;
-      paused = offscreen || document.hidden;
-      if (paused) clearTimeout(timer);
-      else if (was) schedule();
+      if (reduceMotion || offscreen || document.hidden) return;
+      timer = setTimeout(() => {
+        index = (index + 1) % imgs.length;
+        const img = imgs[index];
+        if (img.loading === 'lazy') img.loading = 'eager';
+        imgs.forEach((im, i) => im.classList.toggle('is-active', i === index));
+        schedule();
+      }, 5500);
     };
-    new IntersectionObserver(([e]) => { offscreen = !e.isIntersecting; sync(); }, { threshold: 0.2 }).observe(root);
-    document.addEventListener('visibilitychange', sync);
+    new IntersectionObserver(([e]) => { offscreen = !e.isIntersecting; schedule(); }, { threshold: 0.05 }).observe(root);
+    document.addEventListener('visibilitychange', schedule);
+    window.addEventListener('load', () => setTimeout(() => imgs.forEach((im) => { im.loading = 'eager'; }), 1500));
 
-    let sx = null, sy = null;
-    root.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; }, { passive: true });
-    root.addEventListener('pointerup', (e) => {
-      if (sx === null) return;
-      const dx = e.clientX - sx, dy = e.clientY - sy;
-      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(index + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
-      sx = null;
-    });
+    // scroll-driven expansion (desktop layout only; CSS uses the same query)
+    const mq = window.matchMedia('(min-width: 901px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)');
+    const smooth = (t) => t * t * (3 - 2 * t);
+    let raf = 0;
+    function update() {
+      raf = 0;
+      if (!mq.matches) { root.style.removeProperty('--p'); return; }
+      const dist = root.offsetHeight - window.innerHeight;
+      const raw = dist > 0 ? clamp(-root.getBoundingClientRect().top / dist, 0, 1) : 0;
+      root.style.setProperty('--p', smooth(clamp(raw / 0.85, 0, 1)).toFixed(4));
+    }
+    const kick = () => { if (!raf) raf = requestAnimationFrame(update); };
+    window.addEventListener('scroll', kick, { passive: true });
+    window.addEventListener('resize', kick);
+    if (mq.addEventListener) mq.addEventListener('change', kick);
+    update();
 
-    document.addEventListener('keydown', (e) => {
-      if (offscreen || menuOpen) return;
-      if (e.key === 'ArrowRight') go(index + 1, 1);
-      if (e.key === 'ArrowLeft') go(index - 1, -1);
-    });
-
-    // start once the first frame is painted so the intro text animates in
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      body.classList.add('is-loaded');
-      schedule();
-    }));
+    requestAnimationFrame(() => requestAnimationFrame(() => body.classList.add('is-loaded')));
   })();
 
   /* ---------------------------------------------------------
@@ -258,29 +244,201 @@
   }
 
   /* ---------------------------------------------------------
-     Projects filter
+     Projects: pinned horizontal gallery (desktop) or swipe
+     carousel (phones / reduced motion). Every card gets depth,
+     tilt, saturation and image parallax from its distance to
+     the screen centre; the centred card fills its stage bar.
      --------------------------------------------------------- */
-  const filterBtns = $$('.filters button');
-  const cards = $$('.pcard');
-  filterBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const f = btn.dataset.filter;
-      filterBtns.forEach((b) => {
-        b.classList.toggle('is-active', b === btn);
-        b.setAttribute('aria-selected', String(b === btn));
-      });
-      cards.forEach((c) => {
-        const show = f === 'all' || c.dataset.cat === f;
-        c.classList.remove('is-filtered-in');
-        c.classList.toggle('is-hidden', !show);
-        if (show) {
-          c.classList.add('is-in');
-          reflow(c);
-          c.classList.add('is-filtered-in');
-        }
+  (() => {
+    const section = $('.projects');
+    if (!section) return;
+    const pin = $('.projects__pin', section);
+    const viewport = $('.projects__viewport', section);
+    const track = $('.projects__track', section);
+    const cards = $$('.pj', section);
+    const projectCards = cards.filter((c) => !c.classList.contains('pj--cta'));
+    const filterWrap = $('.filters', section);
+    const filterBtns = $$('.filters button', section);
+    const digits = $('.projects__digits', section);
+    const total = $('.projects__total', section);
+    const pad = (n) => String(n).padStart(2, '0');
+
+    // stage tracker: mark finished segments and the one in progress
+    projectCards.forEach((c) => {
+      const stage = parseInt(getComputedStyle(c).getPropertyValue('--stage'), 10) || 0;
+      const done = c.dataset.cat === 'completed';
+      $$('.pj__stages li', c).forEach((li, i) => {
+        if (i < stage - (done ? 0 : 1)) li.classList.add('is-on');
+        else if (!done && i === stage - 1) li.classList.add('is-now');
       });
     });
-  });
+
+    // spotlight follows the pointer on each card
+    cards.forEach((c) => c.addEventListener('pointermove', (e) => {
+      const r = c.getBoundingClientRect();
+      c.style.setProperty('--x', `${e.clientX - r.left}px`);
+      c.style.setProperty('--y2', `${e.clientY - r.top}px`);
+    }));
+
+    // entrance
+    new IntersectionObserver(([e], obs) => {
+      if (e.isIntersecting) { section.classList.add('is-in'); obs.disconnect(); }
+    }, { threshold: 0.2 }).observe(section);
+
+    let pinned = false;
+    let maxShift = 0;
+    let x = 0;        // eased track offset
+    let target = 0;   // offset the scroll position asks for
+    let raf = 0;
+    let lastCi = -1;
+
+    const visible = () => cards.filter((c) => !c.hidden);
+    const setStagger = () => visible().forEach((c, i) => c.style.setProperty('--n', i));
+
+    function measure() {
+      const want = window.innerWidth > 900 && window.innerHeight >= 600 && !reduceMotion;
+      if (want !== pinned) {
+        pinned = want;
+        section.classList.toggle('is-pinned', pinned);
+        track.style.transform = '';
+        x = target = 0;
+      }
+      if (pinned) {
+        maxShift = Math.max(0, track.scrollWidth - window.innerWidth);
+        pin.style.height = `${window.innerHeight + maxShift}px`;
+      } else {
+        maxShift = 0;
+        pin.style.height = '';
+      }
+      readScroll();
+      x = target;
+      render();
+    }
+
+    function readScroll() {
+      let p;
+      if (pinned) {
+        const top = pin.getBoundingClientRect().top;
+        p = maxShift > 0 ? clamp(-top / maxShift, 0, 1) : 0;
+        target = p * maxShift;
+      } else {
+        const max = viewport.scrollWidth - viewport.clientWidth;
+        p = max > 0 ? viewport.scrollLeft / max : 0;
+      }
+      section.style.setProperty('--pp', p.toFixed(4));
+    }
+
+    function render() {
+      if (pinned) track.style.transform = `translate3d(${(-x).toFixed(1)}px, 0, 0)`;
+      const vw = window.innerWidth;
+      // focus point: in the pinned gallery it travels from the first card's
+      // resting centre to the last card's, so the first card leads at the
+      // start and the last one at the end; in the carousel it is the centre
+      let mid = vw / 2;
+      const vis0 = visible();
+      if (pinned && vis0.length) {
+        const pad = parseFloat(getComputedStyle(track).paddingLeft) || 0;
+        const half = vis0[0].offsetWidth / 2;
+        const p = maxShift > 0 ? x / maxShift : 0;
+        mid = (pad + half) + p * ((vw - pad - half) - (pad + half));
+      }
+      const strength = pinned ? 1 : 0.45;
+      let nearest = null, nearestD = Infinity;
+      visible().forEach((c) => {
+        const r = c.getBoundingClientRect();
+        const d = (r.left + r.width / 2 - mid) / (vw * 0.62);
+        const k = clamp(d, -1, 1);
+        const a = Math.abs(k);
+        if (!reduceMotion) {
+          c.style.setProperty('--s', (1 - a * 0.08 * strength).toFixed(4));
+          c.style.setProperty('--r', `${(k * 2.2 * strength).toFixed(2)}deg`);
+          c.style.setProperty('--y', `${(a * 26 * strength).toFixed(1)}px`);
+          c.style.setProperty('--sat', (1 - a * 0.75 * strength).toFixed(3));
+          c.style.setProperty('--ix', `${(-6 - k * 7).toFixed(2)}%`);
+        }
+        if (Math.abs(d) < nearestD) { nearestD = Math.abs(d); nearest = c; }
+      });
+      cards.forEach((c) => c.classList.toggle('is-near', reduceMotion || c === nearest));
+
+      // counter follows the centred project (the CTA keeps the last number)
+      const vis = visible().filter((c) => !c.classList.contains('pj--cta'));
+      let ci = vis.indexOf(nearest);
+      if (ci < 0) ci = vis.length - 1;
+      if (ci !== lastCi) { lastCi = ci; digits.style.setProperty('--ci', Math.max(ci, 0)); }
+    }
+
+    function loop() {
+      readScroll();
+      x += (target - x) * (pinned ? 0.14 : 1);
+      if (Math.abs(target - x) < 0.3) x = target;
+      render();
+      raf = x !== target ? requestAnimationFrame(loop) : 0;
+    }
+    const kick = () => { if (!raf) raf = requestAnimationFrame(loop); };
+
+    // only run while the section is on screen
+    let onScreen = false;
+    let warmed = false;
+    new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      if (!onScreen) return;
+      // off-screen carousel images may never trigger lazy loading on their own
+      if (!warmed) { warmed = true; $$('img', track).forEach((im) => { im.loading = 'eager'; }); }
+      kick();
+    }, { rootMargin: '600px 0px' }).observe(section);
+    window.addEventListener('scroll', () => { if (onScreen) kick(); }, { passive: true });
+    viewport.addEventListener('scroll', kick, { passive: true });
+    window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
+
+    // filter pill + filtering
+    function movePill() {
+      const active = filterBtns.find((b) => b.classList.contains('is-active'));
+      if (!active) return;
+      filterWrap.style.setProperty('--pl', `${active.offsetLeft}px`);
+      filterWrap.style.setProperty('--pw', `${active.offsetWidth}px`);
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { movePill(); measure(); });
+    window.addEventListener('resize', movePill);
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (btn.classList.contains('is-active')) return;
+        const f = btn.dataset.filter;
+        filterBtns.forEach((b) => {
+          b.classList.toggle('is-active', b === btn);
+          b.setAttribute('aria-selected', String(b === btn));
+        });
+        movePill();
+        section.classList.add('is-filtering');
+        setTimeout(() => {
+          let count = 0;
+          cards.forEach((c) => {
+            const show = c.classList.contains('pj--cta') || f === 'all' || c.dataset.cat === f;
+            c.hidden = !show;
+            if (show && !c.classList.contains('pj--cta')) count++;
+          });
+          total.textContent = pad(count);
+          setStagger();
+          lastCi = -1;
+          // keep the reader at the start of the gallery after a filter
+          if (pinned) {
+            const top = pin.getBoundingClientRect().top + window.scrollY;
+            if (window.scrollY > top) window.scrollTo({ top, behavior: 'instant' });
+          } else {
+            viewport.scrollLeft = 0;
+          }
+          measure();
+          reflow(section);
+          section.classList.remove('is-filtering');
+        }, reduceMotion ? 0 : 320);
+      });
+    });
+
+    setStagger();
+    movePill();
+    measure();
+  })();
 
   /* ---------------------------------------------------------
      CTA background parallax
@@ -297,28 +455,30 @@
   }
 
   /* ---------------------------------------------------------
-     Footer wordmark: fills crimson as it scrolls into view.
-     Reaches 100% once the whole word is on screen, and eases
-     towards the target so it never stops half-way.
+     Footer: on screens where it fits, it sits under the page
+     (body.footer-reveal) and is uncovered as <main> scrolls
+     away. --r is how much of it is showing; the BMU letters
+     rise one after another as it grows.
      --------------------------------------------------------- */
-  const fillEl = $('[data-fill]');
-  let fillNow = 0, fillTarget = 0, fillRaf = 0;
-  function animateFill() {
-    fillNow += (fillTarget - fillNow) * 0.12;
-    if (Math.abs(fillTarget - fillNow) < 0.1) fillNow = fillTarget;
-    fillEl.style.setProperty('--fill', `${fillNow.toFixed(2)}%`);
-    fillRaf = fillNow === fillTarget ? 0 : requestAnimationFrame(animateFill);
+  const footer = $('.footer');
+  const mainEl = $('main');
+  const letters = $$('.footer__word span');
+  function measureFooter() {
+    if (!footer) return;
+    const fits = !reduceMotion && window.innerWidth > 900 && footer.offsetHeight < window.innerHeight - 40;
+    body.classList.toggle('footer-reveal', fits);
   }
-  function updateFill() {
-    if (!fillEl) return;
-    const r = fillEl.getBoundingClientRect();
-    const vh = window.innerHeight;
-    const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
-    const p = atBottom ? 1 : clamp((vh - r.top) / r.height, 0, 1);
-    fillTarget = p * 100;
-    if (reduceMotion) { fillNow = fillTarget; fillEl.style.setProperty('--fill', `${fillNow}%`); return; }
-    if (!fillRaf) fillRaf = requestAnimationFrame(animateFill);
+  function updateFooter() {
+    if (!footer || !mainEl) return;
+    const h = footer.offsetHeight || 1;
+    const r = reduceMotion ? 1 : clamp((window.innerHeight - mainEl.getBoundingClientRect().bottom) / h, 0, 1);
+    footer.style.setProperty('--r', r.toFixed(3));
+    letters.forEach((l, i) => {
+      const t = clamp((r - 0.15 - i * 0.1) / 0.55, 0, 1);
+      l.style.setProperty('--ly', `${((1 - t) * 105).toFixed(1)}%`);
+    });
   }
+  measureFooter();
 
   /* ---------------------------------------------------------
      Scroll loop
@@ -328,7 +488,7 @@
     updateNav();
     updateStats();
     updateParallax();
-    updateFill();
+    updateFooter();
     updatePanels();
     updateProcess();
     ticking = false;
@@ -336,62 +496,170 @@
   window.addEventListener('scroll', () => {
     if (!ticking) { ticking = true; requestAnimationFrame(frame); }
   }, { passive: true });
-  window.addEventListener('resize', () => { measurePanels(); frame(); });
+  window.addEventListener('resize', () => { measurePanels(); measureFooter(); frame(); });
+  window.addEventListener('load', () => { measureFooter(); frame(); });
   frame();
 
   /* ---------------------------------------------------------
-     Enquiry form (Indian mobile number validation)
+     Office hours: shows "Open now" or when we open next,
+     always in Bengaluru time (Mon to Sat, 9:30 AM to 6:30 PM)
      --------------------------------------------------------- */
-  const form = $('.form');
-  const status = $('.form__status');
-  const btnText = $('.form__btn-text');
-  const phone = $('#f-phone');
-
-  const normalisePhone = (v) => {
-    let d = v.replace(/\D/g, '');
-    if (d.length === 12 && d.startsWith('91')) d = d.slice(2);
-    if (d.length === 11 && d.startsWith('0')) d = d.slice(1);
-    return d;
-  };
-  const validMobile = (v) => /^[6-9]\d{9}$/.test(normalisePhone(v));
-
-  phone.addEventListener('input', () => {
-    const d = normalisePhone(phone.value).slice(0, 10);
-    phone.value = d.length > 5 ? `${d.slice(0, 5)} ${d.slice(5)}` : d;
-  });
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    let valid = true;
-    const mark = (el, ok) => {
-      (el.closest('.field') || el.closest('.consent')).classList.toggle('is-invalid', !ok);
-      if (!ok) valid = false;
-    };
-    mark($('#f-name'), $('#f-name').value.trim().length > 1);
-    mark(phone, validMobile(phone.value));
-    mark($('#f-type'), $('#f-type').value !== '');
-    const consent = $('.consent input');
-    mark(consent, consent.checked);
-
-    if (!valid) {
-      status.textContent = validMobile(phone.value) ? 'Please fill in the highlighted fields.' : 'Please enter a valid 10-digit mobile number.';
-      return;
+  (() => {
+    const office = $('.office');
+    const status = $('.office__status');
+    if (!office || !status) return;
+    const OPEN = 9.5, CLOSE = 18.5;
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    function update() {
+      // IST is UTC+5:30 with no daylight saving
+      const ist = new Date(Date.now() + (new Date().getTimezoneOffset() + 330) * 60000);
+      const day = ist.getDay();
+      const h = ist.getHours() + ist.getMinutes() / 60;
+      const workday = day !== 0;
+      const open = workday && h >= OPEN && h < CLOSE;
+      office.classList.toggle('is-open', open);
+      if (open) { status.textContent = 'Open now, until 6:30 PM'; return; }
+      let next = 'today';
+      if (!workday || h >= CLOSE) {
+        const nd = (day + 1) % 7 === 0 ? 1 : (day + 1) % 7;
+        next = nd === (day + 1) % 7 ? 'tomorrow' : days[nd];
+      }
+      status.textContent = `Closed now, opens 9:30 AM ${next}`;
     }
-    btnText.textContent = 'Sending…';
-    status.textContent = '';
-    // TODO: send the form data to your email / CRM / backend here.
-    setTimeout(() => {
-      form.classList.add('is-sent');
-      btnText.textContent = 'Enquiry sent';
-      status.textContent = 'Thank you. We will call you back shortly.';
-      form.reset();
-    }, 800);
+    update();
+    setInterval(update, 60000);
+  })();
+
+  /* ---------------------------------------------------------
+     Headings with [data-words]: words rise in when scrolled to
+     --------------------------------------------------------- */
+  $$('[data-words]').forEach((el) => {
+    const words = el.textContent.trim().split(/\s+/);
+    el.textContent = '';
+    words.forEach((word, i) => {
+      const w = document.createElement('span');
+      w.className = 'w';
+      const inner = document.createElement('span');
+      inner.textContent = word;
+      inner.style.setProperty('--i', i);
+      w.append(inner);
+      el.append(w, i < words.length - 1 ? ' ' : '');
+    });
+    if (reduceMotion || !('IntersectionObserver' in window)) { el.classList.add('is-in'); return; }
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { el.classList.add('is-in'); o.disconnect(); } }, { threshold: 0.4 });
+    o.observe(el);
   });
-  $$('input, select, textarea', form).forEach((el) => {
-    const clear = () => (el.closest('.field') || el.closest('.consent'))?.classList.remove('is-invalid');
-    el.addEventListener('input', clear);
-    el.addEventListener('change', clear);
-  });
+
+  // contact rows: the colour fill spreads from where the pointer enters
+  $$('.way').forEach((w) => w.addEventListener('pointerenter', (e) => {
+    w.style.setProperty('--cx', `${e.clientX - w.getBoundingClientRect().left}px`);
+  }));
+
+  /* ---------------------------------------------------------
+     Enquiry: three steps (what / where / who), validated one
+     step at a time, with Indian mobile number validation
+     --------------------------------------------------------- */
+  (() => {
+    const form = $('.qform');
+    if (!form) return;
+    const steps = $$('.qstep', form);
+    const bar = $('.qform__bar', form);
+    const stepNo = $('.qform__no', form);
+    const back = $('.qform__back', form);
+    const nextText = $('.qform__next-text', form);
+    const status = $('.form__status', form);
+    const phone = $('#f-phone', form);
+    const nameEl = $('#f-name', form);
+    const area = $('#f-area', form);
+    const tiles = $('.tiles', form);
+    let cur = 0;
+    let sending = false;
+
+    const normalisePhone = (v) => {
+      let d = v.replace(/\D/g, '');
+      if (d.length === 12 && d.startsWith('91')) d = d.slice(2);
+      if (d.length === 11 && d.startsWith('0')) d = d.slice(1);
+      return d;
+    };
+    const validMobile = (v) => /^[6-9]\d{9}$/.test(normalisePhone(v));
+    phone.addEventListener('input', () => {
+      const d = normalisePhone(phone.value).slice(0, 10);
+      phone.value = d.length > 5 ? `${d.slice(0, 5)} ${d.slice(5)}` : d;
+    });
+
+    function show(i) {
+      // steps before the current one wait off to the left, later ones to the right,
+      // so moving forward slides left and going back slides right
+      steps.forEach((s, k) => {
+        const on = k === i;
+        s.classList.toggle('is-active', on);
+        s.classList.toggle('is-back', k < i);
+        s.inert = !on;
+      });
+      cur = i;
+      bar.style.setProperty('--prog', ((i + 1) / steps.length).toFixed(4));
+      stepNo.textContent = i + 1;
+      back.hidden = i === 0;
+      nextText.textContent = i === steps.length - 1 ? 'Send enquiry' : 'Next';
+      status.textContent = '';
+      const first = $('input:not([type="radio"]), textarea', steps[i]) || $('input', steps[i]);
+      if (first && i > 0) setTimeout(() => first.focus({ preventScroll: true }), 450);
+    }
+
+    const mark = (el, ok) => { el.classList.toggle('is-invalid', !ok); if (!ok) { reflow(el); } return ok; };
+    function validate(i) {
+      if (i === 0) {
+        const ok = !!$('input[name="type"]:checked', form);
+        tiles.classList.remove('is-invalid');
+        if (!ok) { reflow(tiles); tiles.classList.add('is-invalid'); status.textContent = 'Pick the type of work to continue.'; }
+        return ok;
+      }
+      if (i === 1) {
+        const ok = mark(area.closest('.field'), area.value.trim().length > 1);
+        if (!ok) status.textContent = 'Tell us roughly where the site is.';
+        return ok;
+      }
+      const okName = mark(nameEl.closest('.field'), nameEl.value.trim().length > 1);
+      const okPhone = mark(phone.closest('.field'), validMobile(phone.value));
+      const consent = $('.consent input', form);
+      const okConsent = mark(consent.closest('.consent'), consent.checked);
+      if (!okPhone) status.textContent = 'Please enter a valid 10-digit mobile number.';
+      else if (!okName || !okConsent) status.textContent = 'Please fill in the highlighted fields.';
+      return okName && okPhone && okConsent;
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (sending || form.classList.contains('is-sent')) return;
+      if (!validate(cur)) return;
+      if (cur < steps.length - 1) { show(cur + 1); return; }
+      sending = true;
+      nextText.textContent = 'Sending…';
+      // TODO: send the form data to your email / CRM / backend here.
+      setTimeout(() => {
+        $('.qdone__name', form).textContent = `, ${nameEl.value.trim().split(/\s+/)[0]}`;
+        $('.qdone__phone', form).textContent = `+91 ${phone.value}`;
+        form.classList.add('is-sent');
+        steps.forEach((s) => { s.inert = true; });
+        sending = false;
+      }, 800);
+    });
+    back.addEventListener('click', () => { if (cur > 0) show(cur - 1); });
+
+    // picking a tile moves straight on to the next step
+    $$('input[name="type"]', form).forEach((r) => r.addEventListener('change', () => {
+      tiles.classList.remove('is-invalid');
+      status.textContent = '';
+      if (cur === 0) setTimeout(() => show(1), 380);
+    }));
+    $$('input, textarea', form).forEach((el) => {
+      const clear = () => (el.closest('.field') || el.closest('.consent'))?.classList.remove('is-invalid');
+      el.addEventListener('input', clear);
+      el.addEventListener('change', clear);
+    });
+
+    show(0);
+  })();
 
   $('#year').textContent = new Date().getFullYear();
 })();
