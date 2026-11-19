@@ -76,35 +76,15 @@
   const navLinks = $$('.nav__links a');
   const navTargets = navLinks.map((a) => $(a.getAttribute('href')));
 
-  // glass highlight behind the hovered link, or the current section's link
-  const glider = $('.nav__glider');
-  let hoverLink = null;
-  let currentLink = navLinks[0];
-  function placeGlider(a) {
-    if (!glider || !a || !a.offsetWidth) return;
-    glider.style.setProperty('--gx', `${a.offsetLeft}px`);
-    glider.style.setProperty('--gw', `${a.offsetWidth}px`);
-    glider.style.setProperty('--go', '1');
-  }
-  navLinks.forEach((a) => a.addEventListener('pointerenter', () => { hoverLink = a; placeGlider(a); }));
-  const linksBar = $('.nav__links');
-  if (linksBar) linksBar.addEventListener('pointerleave', () => { hoverLink = null; placeGlider(currentLink); });
-  window.addEventListener('resize', () => placeGlider(hoverLink || currentLink));
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => placeGlider(hoverLink || currentLink));
-
   function updateNav() {
     const y = window.scrollY;
     nav.classList.toggle('is-scrolled', y > 40);
     nav.classList.toggle('is-hidden', y > lastY && y > 700 && !menuOpen);
     lastY = y;
     const mid = window.innerHeight * 0.35;
-    let current = 0;
+    let current = -1;
     navTargets.forEach((s, i) => { if (s && s.getBoundingClientRect().top <= mid) current = i; });
     navLinks.forEach((a, i) => a.classList.toggle('is-active', i === current));
-    if (navLinks[current] !== currentLink || (glider && !glider.style.getPropertyValue('--gw'))) {
-      currentLink = navLinks[current];
-      if (!hoverLink) placeGlider(currentLink);
-    }
   }
 
   /* ---------------------------------------------------------
