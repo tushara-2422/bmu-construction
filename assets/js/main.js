@@ -1,5 +1,5 @@
 /* =========================================================
-   BMU | site interactions (vanilla JS, no dependencies)
+   Build My Universee | site interactions (vanilla JS, no dependencies)
    ========================================================= */
 (() => {
   'use strict';
@@ -56,22 +56,26 @@
      Nav
      --------------------------------------------------------- */
   const nav = $('#nav');
-  const toggle = $('.nav__toggle');
-  const menu = $('#menu');
-  let menuOpen = false;
   let lastY = window.scrollY;
 
+  // below 1100px the links live in a dropdown opened by the menu button
+  const menuBtn = $('.nav__menu');
+  let menuOpen = false;
   function setMenu(open) {
     menuOpen = open;
-    body.classList.toggle('menu-open', open);
-    toggle.setAttribute('aria-expanded', String(open));
-    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-    menu.setAttribute('aria-hidden', String(!open));
-    body.style.overflow = open ? 'hidden' : '';
+    nav.classList.toggle('is-open', open);
+    if (menuBtn) {
+      menuBtn.setAttribute('aria-expanded', String(open));
+      menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    }
   }
-  toggle.addEventListener('click', () => setMenu(!menuOpen));
-  $$('a', menu).forEach((a) => a.addEventListener('click', () => setMenu(false)));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menuOpen) setMenu(false); });
+  if (menuBtn) {
+    menuBtn.addEventListener('click', (e) => { e.stopPropagation(); setMenu(!menuOpen); });
+    $$('.nav__links a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+    document.addEventListener('click', (e) => { if (menuOpen && !nav.contains(e.target)) setMenu(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menuOpen) { setMenu(false); menuBtn.focus(); } });
+    window.addEventListener('resize', () => { if (menuOpen && window.innerWidth >= 1100) setMenu(false); });
+  }
 
   const navLinks = $$('.nav__links a');
   const navTargets = navLinks.map((a) => $(a.getAttribute('href')));
@@ -231,7 +235,8 @@
   const pMedia = $$('.pmedia');
   let pIndex = -1;
   function updateProcess() {
-    if (window.innerWidth <= 860) return;
+    // the stepper runs at every size except short landscape phones, where CSS shows a plain list
+    if (window.innerWidth <= 860 && window.innerHeight < 560) return;
     const r = pPin.getBoundingClientRect();
     const dist = pPin.offsetHeight - window.innerHeight;
     const p = dist > 0 ? clamp(-r.top / dist, 0, 0.9999) : 0;
@@ -297,7 +302,9 @@
     const setStagger = () => visible().forEach((c, i) => c.style.setProperty('--n', i));
 
     function measure() {
-      const want = window.innerWidth > 900 && window.innerHeight >= 600 && !reduceMotion;
+      // pin (scroll drives the cards sideways) on every width, as long as the screen is tall
+      // enough to show a whole card; short landscape phones keep the swipe carousel
+      const want = !reduceMotion && window.innerHeight >= (window.innerWidth > 900 ? 600 : 640);
       if (want !== pinned) {
         pinned = want;
         section.classList.toggle('is-pinned', pinned);
@@ -343,7 +350,7 @@
         const p = maxShift > 0 ? x / maxShift : 0;
         mid = (pad + half) + p * ((vw - pad - half) - (pad + half));
       }
-      const strength = pinned ? 1 : 0.45;
+      const strength = pinned ? (vw <= 700 ? 0.75 : 1) : 0.45;
       let nearest = null, nearestD = Infinity;
       visible().forEach((c) => {
         const r = c.getBoundingClientRect();
@@ -458,7 +465,7 @@
   /* ---------------------------------------------------------
      Footer: on screens where it fits, it sits under the page
      (body.footer-reveal) and is uncovered as <main> scrolls
-     away. --r is how much of it is showing; the BMU letters
+     away. --r is how much of it is showing; the wordmark words
      rise one after another as it grows.
      --------------------------------------------------------- */
   const footer = $('.footer');
@@ -475,7 +482,7 @@
     const r = reduceMotion ? 1 : clamp((window.innerHeight - mainEl.getBoundingClientRect().bottom) / h, 0, 1);
     footer.style.setProperty('--r', r.toFixed(3));
     letters.forEach((l, i) => {
-      const t = clamp((r - 0.15 - i * 0.1) / 0.55, 0, 1);
+      const t = clamp((r - 0.15 - i * 0.12) / 0.5, 0, 1);
       l.style.setProperty('--ly', `${((1 - t) * 105).toFixed(1)}%`);
     });
   }
@@ -485,7 +492,16 @@
      Scroll loop
      --------------------------------------------------------- */
   let ticking = false;
+  // thin reading-progress line along the top of the screen
+  const progressBar = $('.progress i');
+  function updateProgress() {
+    if (!progressBar) return;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.setProperty('--read', max > 0 ? clamp(window.scrollY / max, 0, 1).toFixed(4) : '0');
+  }
+
   function frame() {
+    updateProgress();
     updateNav();
     updateStats();
     updateParallax();
