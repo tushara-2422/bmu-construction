@@ -242,8 +242,6 @@
      How it works: pinned stepper, scroll moves 01 to 05
      --------------------------------------------------------- */
   const pPin = $('.process__pin');
-  const pNav = $$('.process__nav li');
-  const pDigits = $('.process__digits');
   const pSteps = $$('.pstep');
   const pMedia = $$('.pmedia');
   let pIndex = -1;
@@ -256,8 +254,6 @@
     const idx = Math.floor(p * pSteps.length);
     if (idx === pIndex) return;
     pIndex = idx;
-    pDigits.style.transform = `translateY(${-idx}em)`;
-    pNav.forEach((li, i) => { li.classList.toggle('is-active', i === idx); li.classList.toggle('is-done', i < idx); });
     pSteps.forEach((s, i) => s.classList.toggle('is-active', i === idx));
     pMedia.forEach((m, i) => { m.classList.toggle('is-active', i === idx); m.classList.toggle('is-past', i < idx); });
   }
@@ -276,11 +272,6 @@
     const track = $('.projects__track', section);
     const cards = $$('.pj', section);
     const projectCards = cards.filter((c) => !c.classList.contains('pj--cta'));
-    const filterWrap = $('.filters', section);
-    const filterBtns = $$('.filters button', section);
-    const digits = $('.projects__digits', section);
-    const total = $('.projects__total', section);
-    const pad = (n) => String(n).padStart(2, '0');
 
     // stage tracker: mark finished segments and the one in progress
     projectCards.forEach((c) => {
@@ -309,7 +300,6 @@
     let x = 0;        // eased track offset
     let target = 0;   // offset the scroll position asks for
     let raf = 0;
-    let lastCi = -1;
 
     const visible = () => cards.filter((c) => !c.hidden);
     const setStagger = () => visible().forEach((c, i) => c.style.setProperty('--n', i));
@@ -380,12 +370,6 @@
         if (Math.abs(d) < nearestD) { nearestD = Math.abs(d); nearest = c; }
       });
       cards.forEach((c) => c.classList.toggle('is-near', reduceMotion || c === nearest));
-
-      // counter follows the centred project (the CTA keeps the last number)
-      const vis = visible().filter((c) => !c.classList.contains('pj--cta'));
-      let ci = vis.indexOf(nearest);
-      if (ci < 0) ci = vis.length - 1;
-      if (ci !== lastCi) { lastCi = ci; digits.style.setProperty('--ci', Math.max(ci, 0)); }
     }
 
     function loop() {
@@ -412,52 +396,9 @@
     window.addEventListener('resize', measure);
     window.addEventListener('load', measure);
 
-    // filter pill + filtering
-    function movePill() {
-      const active = filterBtns.find((b) => b.classList.contains('is-active'));
-      if (!active) return;
-      filterWrap.style.setProperty('--pl', `${active.offsetLeft}px`);
-      filterWrap.style.setProperty('--pw', `${active.offsetWidth}px`);
-    }
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { movePill(); measure(); });
-    window.addEventListener('resize', movePill);
-
-    filterBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        if (btn.classList.contains('is-active')) return;
-        const f = btn.dataset.filter;
-        filterBtns.forEach((b) => {
-          b.classList.toggle('is-active', b === btn);
-          b.setAttribute('aria-selected', String(b === btn));
-        });
-        movePill();
-        section.classList.add('is-filtering');
-        setTimeout(() => {
-          let count = 0;
-          cards.forEach((c) => {
-            const show = c.classList.contains('pj--cta') || f === 'all' || c.dataset.cat === f;
-            c.hidden = !show;
-            if (show && !c.classList.contains('pj--cta')) count++;
-          });
-          total.textContent = pad(count);
-          setStagger();
-          lastCi = -1;
-          // keep the reader at the start of the gallery after a filter
-          if (pinned) {
-            const top = pin.getBoundingClientRect().top + window.scrollY;
-            if (window.scrollY > top) window.scrollTo({ top, behavior: 'instant' });
-          } else {
-            viewport.scrollLeft = 0;
-          }
-          measure();
-          reflow(section);
-          section.classList.remove('is-filtering');
-        }, reduceMotion ? 0 : 320);
-      });
-    });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
 
     setStagger();
-    movePill();
     measure();
   })();
 
@@ -573,116 +514,12 @@
     o.observe(el);
   });
 
-  // contact rows: the colour fill spreads from where the pointer enters
-  $$('.way').forEach((w) => w.addEventListener('pointerenter', (e) => {
-    w.style.setProperty('--cx', `${e.clientX - w.getBoundingClientRect().left}px`);
+  // contact cards: a soft light follows the pointer across the card
+  $$('.way').forEach((w) => w.addEventListener('pointermove', (e) => {
+    const r = w.getBoundingClientRect();
+    w.style.setProperty('--cx', `${e.clientX - r.left}px`);
+    w.style.setProperty('--cy', `${e.clientY - r.top}px`);
   }));
-
-  /* ---------------------------------------------------------
-     Enquiry: three steps (what / where / who), validated one
-     step at a time, with Indian mobile number validation
-     --------------------------------------------------------- */
-  (() => {
-    const form = $('.qform');
-    if (!form) return;
-    const steps = $$('.qstep', form);
-    const bar = $('.qform__bar', form);
-    const stepNo = $('.qform__no', form);
-    const back = $('.qform__back', form);
-    const nextText = $('.qform__next-text', form);
-    const status = $('.form__status', form);
-    const phone = $('#f-phone', form);
-    const nameEl = $('#f-name', form);
-    const area = $('#f-area', form);
-    const tiles = $('.tiles', form);
-    let cur = 0;
-    let sending = false;
-
-    const normalisePhone = (v) => {
-      let d = v.replace(/\D/g, '');
-      if (d.length === 12 && d.startsWith('91')) d = d.slice(2);
-      if (d.length === 11 && d.startsWith('0')) d = d.slice(1);
-      return d;
-    };
-    const validMobile = (v) => /^[6-9]\d{9}$/.test(normalisePhone(v));
-    phone.addEventListener('input', () => {
-      const d = normalisePhone(phone.value).slice(0, 10);
-      phone.value = d.length > 5 ? `${d.slice(0, 5)} ${d.slice(5)}` : d;
-    });
-
-    function show(i) {
-      // steps before the current one wait off to the left, later ones to the right,
-      // so moving forward slides left and going back slides right
-      steps.forEach((s, k) => {
-        const on = k === i;
-        s.classList.toggle('is-active', on);
-        s.classList.toggle('is-back', k < i);
-        s.inert = !on;
-      });
-      cur = i;
-      bar.style.setProperty('--prog', ((i + 1) / steps.length).toFixed(4));
-      stepNo.textContent = i + 1;
-      back.hidden = i === 0;
-      nextText.textContent = i === steps.length - 1 ? 'Send enquiry' : 'Next';
-      status.textContent = '';
-      const first = $('input:not([type="radio"]), textarea', steps[i]) || $('input', steps[i]);
-      if (first && i > 0) setTimeout(() => first.focus({ preventScroll: true }), 450);
-    }
-
-    const mark = (el, ok) => { el.classList.toggle('is-invalid', !ok); if (!ok) { reflow(el); } return ok; };
-    function validate(i) {
-      if (i === 0) {
-        const ok = !!$('input[name="type"]:checked', form);
-        tiles.classList.remove('is-invalid');
-        if (!ok) { reflow(tiles); tiles.classList.add('is-invalid'); status.textContent = 'Pick the type of work to continue.'; }
-        return ok;
-      }
-      if (i === 1) {
-        const ok = mark(area.closest('.field'), area.value.trim().length > 1);
-        if (!ok) status.textContent = 'Tell us roughly where the site is.';
-        return ok;
-      }
-      const okName = mark(nameEl.closest('.field'), nameEl.value.trim().length > 1);
-      const okPhone = mark(phone.closest('.field'), validMobile(phone.value));
-      const consent = $('.consent input', form);
-      const okConsent = mark(consent.closest('.consent'), consent.checked);
-      if (!okPhone) status.textContent = 'Please enter a valid 10-digit mobile number.';
-      else if (!okName || !okConsent) status.textContent = 'Please fill in the highlighted fields.';
-      return okName && okPhone && okConsent;
-    }
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (sending || form.classList.contains('is-sent')) return;
-      if (!validate(cur)) return;
-      if (cur < steps.length - 1) { show(cur + 1); return; }
-      sending = true;
-      nextText.textContent = 'Sending…';
-      // TODO: send the form data to your email / CRM / backend here.
-      setTimeout(() => {
-        $('.qdone__name', form).textContent = `, ${nameEl.value.trim().split(/\s+/)[0]}`;
-        $('.qdone__phone', form).textContent = `+91 ${phone.value}`;
-        form.classList.add('is-sent');
-        steps.forEach((s) => { s.inert = true; });
-        sending = false;
-      }, 800);
-    });
-    back.addEventListener('click', () => { if (cur > 0) show(cur - 1); });
-
-    // picking a tile moves straight on to the next step
-    $$('input[name="type"]', form).forEach((r) => r.addEventListener('change', () => {
-      tiles.classList.remove('is-invalid');
-      status.textContent = '';
-      if (cur === 0) setTimeout(() => show(1), 380);
-    }));
-    $$('input, textarea', form).forEach((el) => {
-      const clear = () => (el.closest('.field') || el.closest('.consent'))?.classList.remove('is-invalid');
-      el.addEventListener('input', clear);
-      el.addEventListener('change', clear);
-    });
-
-    show(0);
-  })();
 
   $('#year').textContent = new Date().getFullYear();
 })();
