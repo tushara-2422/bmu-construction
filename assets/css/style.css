@@ -1,5 +1,5 @@
 /* =========================================================
-   Build My Universee | Civil contractors, Bengaluru
+   CoreCrete | Civil contractors, Bengaluru
    ========================================================= */
 
 :root {
@@ -326,13 +326,9 @@ a:hover > .nav__txt > span, a:hover > .nav__txt::after { transform: translateY(-
   .nav.is-open .nav__menu span:first-child, .nav.is-open .nav__menu span:last-child { top: 20.5px; right: 12px; }
   .nav__inner > .nav__links { width: 100%; }
 }
-/* small phones: a slightly smaller name keeps everything on one line */
-@media (max-width: 400px) {
-  .brand__name { font-size: 16px; }
-}
 @media (max-width: 360px) {
   .nav__inner { gap: 6px; padding: 6px 6px 6px 14px; }
-  .brand__name { font-size: 14px; }
+  .brand__name { font-size: 17px; }
   .nav__inner > .nav__actions { gap: 5px; }
   .nav__menu { width: 38px; height: 38px; }
   .nav__menu span { left: 11px; right: 11px; }
@@ -358,11 +354,15 @@ a:hover > .nav__txt > span, a:hover > .nav__txt::after { transform: translateY(-
   font-size: 14px;
   font-weight: 600;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
-  transition: gap 0.4s var(--ease), padding 0.4s var(--ease);
+  transition: gap 0.4s var(--ease), padding 0.4s var(--ease), opacity 0.4s var(--ease), transform 0.5s var(--ease);
 }
 .wa span { max-width: 0; overflow: hidden; white-space: nowrap; transition: max-width 0.4s var(--ease); }
 .wa:hover { gap: 10px; padding-right: 20px; }
 .wa:hover span { max-width: 140px; }
+/* phones & tablets: keep the hero's stats clear; the button slides back in after the hero */
+@media (max-width: 900px) {
+  .at-hero .wa { opacity: 0; transform: translateY(16px) scale(0.7); pointer-events: none; }
+}
 
 /* ---------- Hero: cinematic expanding window ----------
    Base styles are the stacked phone layout. The media query at
@@ -418,7 +418,7 @@ a:hover > .nav__txt > span, a:hover > .nav__txt::after { transform: translateY(-
     inset: 0;
     aspect-ratio: auto;
     border-radius: 0;
-    clip-path: inset(calc((1 - var(--p)) * 24vh) calc((1 - var(--p)) * 31vw) round calc((1 - var(--p)) * 28px));
+    clip-path: inset(calc((1 - var(--p)) * 24vh) calc((1 - var(--p)) * 31vw) calc((1 - var(--p)) * 27vh) round calc((1 - var(--p)) * 28px));
   }
   .hero__window::after { background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.7)); opacity: calc(0.35 + var(--p) * 0.65); }
   .hero__curtain img { transform: scale(calc(1.28 - var(--p) * 0.28)); }
@@ -454,12 +454,49 @@ a:hover > .nav__txt > span, a:hover > .nav__txt::after { transform: translateY(-
   .is-loaded .hero__curtain { clip-path: inset(0 0 0 0); transition: clip-path 1.5s var(--ease-io) 0.1s; }
 }
 
+/* ---------- phones & tablets: the same pinned cinematic version ----------
+   The photo card sits between "We build" and "Bengaluru." above the intro
+   text, then grows to full screen as you scroll. JS measures the intro
+   block into --bar-h so the card always clears it on any phone height. */
+@media (max-width: 900px) and (min-height: 640px) and (prefers-reduced-motion: no-preference) {
+  /* card bottom = intro block + its offset from the screen edge + a clear gap for "Bengaluru." */
+  .hero { height: 210vh; height: 210svh; --bar-gap: max(20px, 3svh); --win-top: max(24svh, 150px); --win-bottom: calc(var(--bar-h, 260px) + var(--bar-gap) + 56px); }
+  .hero__stage { position: sticky; top: 0; height: 100vh; height: 100svh; padding: 0; display: block; overflow: hidden; }
+
+  .hero__window {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+    border-radius: 0;
+    clip-path: inset(calc((1 - var(--p)) * var(--win-top)) calc((1 - var(--p)) * 7vw) calc((1 - var(--p)) * var(--win-bottom)) round calc((1 - var(--p)) * 22px));
+  }
+  /* stronger shade at the bottom: the intro text sits over the photo once it fills the screen */
+  .hero__window::after { background: linear-gradient(180deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0) 22%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.88) 78%); opacity: calc(0.3 + var(--p) * 0.7); }
+  .hero__curtain img { transform: scale(calc(1.25 - var(--p) * 0.25)); }
+  .hero__curtain::after { content: ""; position: absolute; inset: 0; background: #050505; opacity: calc(var(--p) * 0.3); pointer-events: none; }
+
+  .hero__title { position: absolute; inset: 0; z-index: 2; pointer-events: none; font-size: min(15.5vw, 6.4rem); }
+  .hero__line { position: absolute; white-space: nowrap; }
+  .hero__line--a { left: var(--gutter); top: calc(var(--win-top) - 0.62em); }
+  .hero__line--b { right: var(--gutter); bottom: calc(var(--win-bottom) - 0.36em); text-align: right; }
+
+  .hero__bar { position: absolute; z-index: 3; left: var(--gutter); right: var(--gutter); bottom: var(--bar-gap); display: grid; gap: 16px; }
+  .hero__lead { font-size: 14px; line-height: 1.6; color: rgba(242, 241, 238, calc(0.72 + var(--p) * 0.25)); }
+  .hero__facts b { font-size: 1.35rem; }
+  .hero__facts span { font-size: 11.5px; }
+
+  /* intro opens the card from its middle, as on desktop */
+  .js .hero__curtain { clip-path: inset(50% 0 50% 0); transform: none; }
+  .is-loaded .hero__curtain { clip-path: inset(0 0 0 0); transition: clip-path 1.5s var(--ease-io) 0.1s; }
+}
+@media (max-width: 900px) and (min-height: 640px) and (max-height: 740px) and (prefers-reduced-motion: no-preference) {
+  .hero__lead { font-size: 13px; line-height: 1.55; }
+  .hero__bar { gap: 12px; }
+}
+
 @keyframes fill { to { transform: scaleX(1); } }
 
 /* ---------- Finishing touches ---------- */
-/* reading progress: a thin crimson-to-gold line along the top edge */
-.progress { position: fixed; inset: 0 0 auto; z-index: 101; height: 2px; pointer-events: none; }
-.progress i { display: block; height: 100%; background: linear-gradient(90deg, var(--red-2), var(--gold)); box-shadow: 0 0 10px rgba(214, 176, 106, 0.45); transform: scaleX(var(--read, 0)); transform-origin: left; }
 /* a very faint film grain over the whole page, for a printed, tactile feel */
 body::after {
   content: "";
@@ -575,10 +612,6 @@ body::after {
 .office__info h3 { font-size: 1.02rem; font-weight: 650; }
 .office__info p { font-size: 14px; line-height: 1.55; color: rgba(242, 241, 238, 0.85); }
 .office__hours { display: flex; align-items: center; gap: 8px; font-size: 13.5px !important; color: var(--muted) !important; }
-.office__dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--muted-2); }
-.office.is-open .office__dot { background: #3ccf7a; animation: open-ping 2.4s ease-out infinite; }
-.office.is-open .office__status { color: #a7ecc3; }
-@keyframes open-ping { 0% { box-shadow: 0 0 0 0 rgba(60, 207, 122, 0.6); } 70%, 100% { box-shadow: 0 0 0 8px rgba(60, 207, 122, 0); } }
 .office__dir { justify-self: start; margin-top: 2px; font-size: 14px; font-weight: 600; color: var(--red-2); border-bottom: 1px solid currentColor; padding-bottom: 1px; }
 .office__dir:hover { color: #fff; }
 
@@ -720,11 +753,11 @@ main { position: relative; z-index: 1; background: var(--bg); }
 .footer__cols > div > p + p { margin-top: 10px; }
 .footer__muted { color: var(--muted-2) !important; font-size: 13.5px !important; }
 
-/* giant wordmark: the brand name, its words rising one after another as the
-   footer is uncovered. One line on wide screens, two on phones. */
-.footer__word { display: flex; flex-wrap: wrap; justify-content: center; column-gap: 0.24em; margin-top: clamp(10px, 2vw, 30px); padding: 0.06em var(--gutter) 0.1em; font-size: clamp(3.4rem, 8.4vw, 9.5rem); font-weight: 800; line-height: 0.95; letter-spacing: -0.05em; user-select: none; overflow: hidden; }
+/* giant wordmark: the brand name, its two halves rising one after the other
+   as the footer is uncovered */
+.footer__word { display: flex; flex-wrap: nowrap; justify-content: center; column-gap: 0; margin-top: clamp(10px, 2vw, 30px); padding: 0.06em var(--gutter) 0.1em; font-size: clamp(4rem, 15.5vw, 16rem); font-weight: 800; line-height: 0.95; letter-spacing: -0.05em; user-select: none; overflow: hidden; }
 @media (max-width: 700px) {
-  .footer__word { font-size: 15.5vw; }
+  .footer__word { font-size: 16.5vw; }
 }
 .footer__word span {
   display: inline-block;
@@ -912,7 +945,9 @@ main { position: relative; z-index: 1; background: var(--bg); }
 .process { padding-bottom: 0; }
 .process__intro { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
 .process__heading { margin-left: auto; max-width: 12ch; text-align: right; font-weight: 650; font-size: clamp(2.4rem, 5.4vw, 5rem); line-height: 0.98; letter-spacing: -0.05em; }
-.process__heading span { color: #5f5e5a; }
+/* words start dim and light up one after another as the heading scrolls up (see main.js) */
+.process__heading .sw { color: rgba(242, 241, 238, 0.14); transition: color 0.5s var(--ease); }
+.process__heading .sw.is-lit { color: var(--text); }
 .process__pin { position: relative; height: 500vh; }
 .process__sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; max-width: var(--container); margin-inline: auto; }
 
@@ -1155,16 +1190,6 @@ main { position: relative; z-index: 1; background: var(--bg); }
 .pj__cta-ring { position: absolute; right: -60px; top: -90px; width: 220px; height: 220px; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.25); animation: spin 30s linear infinite; }
 .pj__cta-ring::after { content: ""; position: absolute; inset: 30px; border-radius: 50%; border: 1px solid rgba(208, 29, 63, 0.5); }
 
-/* foot: progress + hint */
-.projects__foot { position: relative; z-index: 2; display: flex; align-items: center; gap: 24px; }
-.projects__bar { position: relative; flex: 1; height: 2px; border-radius: 2px; background: var(--line-2); overflow: hidden; }
-.projects__bar i { position: absolute; inset: 0; background: linear-gradient(90deg, var(--red-3), var(--red-2), #ff8aa0); transform: scaleX(var(--pp)); transform-origin: left; }
-.projects__hint { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-.projects__hint svg { color: var(--red-2); animation: nudge 1.6s var(--ease) infinite; }
-.projects__hint-touch { display: none; }
-.projects:not(.is-pinned) .projects__hint-desk { display: none; }
-.projects:not(.is-pinned) .projects__hint-touch { display: inline; }
-@keyframes nudge { 50% { transform: translateX(6px); } }
 
 /* entrance + filter transitions (opacity/translate, separate from the per-frame transform) */
 .js .pj { opacity: 0; translate: 0 70px; }
@@ -1183,7 +1208,7 @@ main { position: relative; z-index: 1; background: var(--bg); }
 }
 
 /* phones & tablets: the same pinned, scroll-driven gallery as desktop, in a
-   compact layout so the heading, filters, one full card and the progress bar
+   compact layout so the heading, filters and one full card
    all fit on one screen */
 @media (max-width: 900px) {
   .projects.is-pinned .projects__sticky { padding: 76px 0 16px; gap: 14px; }
@@ -1196,7 +1221,6 @@ main { position: relative; z-index: 1; background: var(--bg); }
   .projects.is-pinned .pj__facts { margin-top: 10px; padding-top: 10px; }
   .projects.is-pinned .pj__stages { padding-top: 12px; }
   .projects.is-pinned .projects__digits { font-size: 1.8rem; }
-  .projects.is-pinned .projects__hint { font-size: 11px; }
 }
 /* shorter phones (e.g. 360 x 640): a smaller photo and tighter spacing */
 @media (max-width: 900px) and (max-height: 700px) {

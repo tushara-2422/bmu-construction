@@ -1,5 +1,5 @@
 /* =========================================================
-   Build My Universee | site interactions (vanilla JS, no dependencies)
+   CoreCrete | site interactions (vanilla JS, no dependencies)
    ========================================================= */
 (() => {
   'use strict';
@@ -127,12 +127,25 @@
         schedule();
       }, 5500);
     };
-    new IntersectionObserver(([e]) => { offscreen = !e.isIntersecting; schedule(); }, { threshold: 0.05 }).observe(root);
+    new IntersectionObserver(([e]) => {
+      offscreen = !e.isIntersecting;
+      // lets CSS tuck the floating WhatsApp button away while the hero fills a phone screen
+      body.classList.toggle('at-hero', e.isIntersecting);
+      schedule();
+    }, { threshold: 0.05 }).observe(root);
     document.addEventListener('visibilitychange', schedule);
     window.addEventListener('load', () => setTimeout(() => imgs.forEach((im) => { im.loading = 'eager'; }), 1500));
 
-    // scroll-driven expansion (desktop layout only; CSS uses the same query)
-    const mq = window.matchMedia('(min-width: 901px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)');
+    // scroll-driven expansion on desktop, tablets and phones (CSS uses the same queries);
+    // short landscape screens and reduced motion keep the stacked layout
+    const mq = window.matchMedia('(min-width: 901px) and (min-height: 600px) and (prefers-reduced-motion: no-preference), (max-width: 900px) and (min-height: 640px) and (prefers-reduced-motion: no-preference)');
+
+    // phones: the photo card has to clear the intro text block at the bottom
+    const heroBar = $('.hero__bar', root);
+    const measureBar = () => { if (heroBar) root.style.setProperty('--bar-h', `${Math.ceil(heroBar.offsetHeight)}px`); };
+    measureBar();
+    window.addEventListener('resize', measureBar);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureBar);
     const smooth = (t) => t * t * (3 - 2 * t);
     let raf = 0;
     function update() {
@@ -492,16 +505,39 @@
      Scroll loop
      --------------------------------------------------------- */
   let ticking = false;
-  // thin reading-progress line along the top of the screen
-  const progressBar = $('.progress i');
-  function updateProgress() {
-    if (!progressBar) return;
-    const max = document.documentElement.scrollHeight - window.innerHeight;
-    progressBar.style.setProperty('--read', max > 0 ? clamp(window.scrollY / max, 0, 1).toFixed(4) : '0');
+  // "How we work" heading: its words light up one after another as it scrolls up the screen
+  const fillHeading = $('[data-scroll-fill]');
+  const fillWords = [];
+  if (fillHeading) {
+    const words = fillHeading.textContent.trim().split(/\s+/);
+    fillHeading.textContent = '';
+    words.forEach((word, i) => {
+      const s = document.createElement('span');
+      s.className = 'sw';
+      s.textContent = word;
+      fillHeading.append(s, i < words.length - 1 ? ' ' : '');
+      fillWords.push(s);
+    });
+  }
+  let litCount = -1;
+  function updateHeadingFill() {
+    if (!fillHeading) return;
+    let lit = fillWords.length;
+    if (!reduceMotion) {
+      // starts filling when the heading enters the lower part of the screen,
+      // and is complete by the time it reaches the upper third
+      const r = fillHeading.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const p = clamp((vh * 0.9 - r.top) / (vh * 0.55), 0, 1);
+      lit = Math.round(p * fillWords.length);
+    }
+    if (lit === litCount) return;
+    litCount = lit;
+    fillWords.forEach((w, i) => w.classList.toggle('is-lit', i < lit));
   }
 
   function frame() {
-    updateProgress();
+    updateHeadingFill();
     updateNav();
     updateStats();
     updateParallax();
@@ -516,36 +552,6 @@
   window.addEventListener('resize', () => { measurePanels(); measureFooter(); frame(); });
   window.addEventListener('load', () => { measureFooter(); frame(); });
   frame();
-
-  /* ---------------------------------------------------------
-     Office hours: shows "Open now" or when we open next,
-     always in Bengaluru time (Mon to Sat, 9:30 AM to 6:30 PM)
-     --------------------------------------------------------- */
-  (() => {
-    const office = $('.office');
-    const status = $('.office__status');
-    if (!office || !status) return;
-    const OPEN = 9.5, CLOSE = 18.5;
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    function update() {
-      // IST is UTC+5:30 with no daylight saving
-      const ist = new Date(Date.now() + (new Date().getTimezoneOffset() + 330) * 60000);
-      const day = ist.getDay();
-      const h = ist.getHours() + ist.getMinutes() / 60;
-      const workday = day !== 0;
-      const open = workday && h >= OPEN && h < CLOSE;
-      office.classList.toggle('is-open', open);
-      if (open) { status.textContent = 'Open now, until 6:30 PM'; return; }
-      let next = 'today';
-      if (!workday || h >= CLOSE) {
-        const nd = (day + 1) % 7 === 0 ? 1 : (day + 1) % 7;
-        next = nd === (day + 1) % 7 ? 'tomorrow' : days[nd];
-      }
-      status.textContent = `Closed now, opens 9:30 AM ${next}`;
-    }
-    update();
-    setInterval(update, 60000);
-  })();
 
   /* ---------------------------------------------------------
      Headings with [data-words]: words rise in when scrolled to
